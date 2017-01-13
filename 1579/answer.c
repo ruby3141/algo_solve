@@ -1,37 +1,66 @@
-//https://www.acmicpc.net/problem/1579
+//https://www.nnacmicpc.net/problem/1579
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-
-//function prototypes
-void flip_map(map_t map);
-void calcpathv(map_t map, int32_t **path);
-map_t *map_init(int32_t n, int32_t m);
-map_t *map_copy(map_t *map);
+#include <string.h>
 
 typedef struct map_t
 {
-	int32_t **map;
-	int32_t n, m; //same name in the question for height and width.
-	int32_t result;
+	int16_t **map;
+	int16_t **path;
+	int8_t n, m; //same name in the question for height and width.
+	int16_t result;
 } map_t;
 
-int32_t main(void)
+typedef struct maplist_t
 {
-	//todo
+	map_t **maplist;
+	int16_t size;
+	int16_t b;
+} maplist_t
+
+//function prototypes
+void flip_map(map_t *map);
+void calcpathv(map_t *map);
+map_t *map_init(int8_t n, int8_t m);
+map_t *map_copy(map_t *map);
+void collectpath(maplist_t maplist, int32_t startpoint, int8_t n, int8_t m);
+
+int main(void)
+{
+	int8_t i, j;
+	int32_t q;;
+
+	q = 1;
+	maplist = (map_t **)malloc(sizeof(map_t *));
+	scanf("%d %d", &i, &j);
+	maplist[0] = map_init(i, j);
+	i = 0;
+	while(i < *(maplist)->n)
+	{
+		j = 0;
+		while(j < *(maplist)->m)
+		{
+			scanf("%d", *(maplist)->map[i][j]);
+			j++;
+		}
+		i++;
+	}
 }
 
-map_t *map_init(int32_t n, int32_t m)
+map_t *map_init(int8_t n, int8_t m)
 {
 	map_t *temp;
-	int32_t i;
+	int8_t i;
 
 	temp = (map_t *)malloc(sizeof(map_t));
-	temp->map = (int32_t **)malloc(sizeof(int32_t *) * n);
+	temp->map = (int16_t **)malloc(sizeof(int16_t *) * n);
+	temp->path = (int16_t **)malloc(sizeof(int16_t *) * n);
 	i = 0;
 	while(i < n)
 	{
-		*(temp->map+i) = (int32_t *)malloc(m*sizeof(int32_t));
+		*(temp->map+i) = (int16_t *)malloc(m*sizeof(int16_t));
+		*(temp->path+i) = (int16_t *)malloc(m*sizeof(int16_t));
 		i++;
 	}
 	temp->n = n;
@@ -43,132 +72,67 @@ map_t *map_init(int32_t n, int32_t m)
 map_t *map_copy(map_t *map)
 {
 	map_t *temp;
-	int32-t i;
+	int8_t i;
 
-	temp = map_init(map.n, map.m);
+	temp = map_init(map->n, map->m);
 	i = 0;
-	while(i < map.n)
+	while(i < map->n)
 	{
-		memcpy(*(map->map + i), *temp->map + i, m);
+		memcpy(*(map->map + i), *(temp->map + i), map->m);
+		memcpy(*(map->path + i), *(temp->path +i), map->m);
 	}
+	return temp;
 }
 
-void flip_map(map_t map)
+void flip_map(map_t *map)
 {
-	int32_t i,j,buf;
+	int8_t i,j
+	int16_t buf;
 
 	i = 0;
-	while(i<map.n)
+	while(i < map->n)
 	{
 		j=0;
-		while(j<((map.m+1)/2))
+		while(j < ((map->m + 1) / 2))
 		{
-			buf = map.map[i][j];
-			map.map[i][j] = map.map[n-i-1][m-j-1];
-			map.map[n-i-1][m-j-1] = buf;
+			buf = map->map[i][j];
+			map->map[i][j] = map->map[map->n - i - 1][map->m - j - 1];
+			map->map[map->n - i - 1][map->m - j - 1] = buf;
 			j++;
 		}
 		i++;
 	}
 }
 
-void calcpathv(map_t **map, int32_t **path)
+void calcpathv(map_t *map)
 {
-	int32_t i, j;
+	int8_t i, j;
 	i = 0;
-	while(i < map.n)
+	while(i < map->n)
 	{
 		j = 0;
-		while(j < map.m)
+		while(j < map->m)
 		{
-			path[i][j] = map.map[i][j];
+			map->path[i][j] = map->map[i][j];
 			if(i == 0 && j == 0); //structural mistake, but not serious.
-			else if(i == 0) path[i][j] += path[i][j-1];
-			else if(j == 0) path[i][j] += path[i-1][j];
-			else if(path[i][j-1] > path[i-1][j])
+			else if(i == 0) map->path[i][j] += map->path[i][j-1];
+			else if(j == 0) map->path[i][j] += map->path[i-1][j];
+			else if(map->path[i][j-1] > map->path[i-1][j])
 			{
-				path[i][j] += path[i][j-1];
+				map->path[i][j] += map->path[i][j-1];
 			}
 			else
 			{
-				path[i][j] += path[i-1][j];
+				map->path[i][j] += map->path[i-1][j];
 			}
 			j++;
 		}
 		i++;
 	}
-	map.result += path[n-1][m-1];
+	map->result += map->path[map->n-1][map->m-1];
 }
 
-/*
-int32_t main(void)
+void collectpath(maplist_t maplist, int32_t startpoint, int8_t n, int8_t m)
 {
-	int32_t n, m, i, j, k, result;//same name in the question. i, j, k are temp variables.
-	int32_t **map, **path, ***maplist, listsize;
-
-	scanf("%d %d", &n, &m);
-	maplist = (int32_t ***) malloc(1*sizeof(int32_t **));
-	listsize = 1;
-	map = (int32_t **)malloc(n*sizeof(int32_t *));
-	path = (int32_t **)malloc(n*sizeof(int32_t *));
-	i = 0;
-	while(i < n)
-	{
-		*(map+i) = (int32_t *)malloc(m*sizeof(int32_t));
-		*(path+i) = (int32_t *)malloc(m*sizeof(int32_t));
-		i++;
-	}
-	i = 0;
-	while(i < n)
-	{
-		j = 0;
-		while(j < m)
-		{
-			scanf("%d", &map[i][j]);
-			j++;
-		}
-		i++;
-	}
-	result = 0;
-	k = 3;
-	while(k--)
-	{
-		calcpathv(map, path, n, m);
-		i = n-1;
-		j = m-1;
-		result += path[i][j];
-		map[i][j] = 0;
-		while(i > 0 && j > 0)
-		{
-			if(path[i][j] - map[i][j] == path[i][j-1])
-			{
-				map[i][j-1] = 0;
-				j--;
-			}
-			else
-			{
-				map[i-1][j] =0;
-				i--;
-			}
-		}
-		if(i == 0)
-		{
-			while(j >= 0)
-			{
-				map[i][j] = 0;
-				j--;
-			}
-		}
-		else
-		{
-			while(i >= 0)
-			{
-				map[i][j] = 0;
-				i--;
-			}
-		}
-		flip(map, n, m);
-	}
-	printf("%d\n", result);
+	
 }
-*/
