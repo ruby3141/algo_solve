@@ -16,7 +16,6 @@ typedef struct maplist_t
 {
 	map_t **maplist;
 	int16_t size;
-	int16_t b;
 } maplist_t
 
 //function prototypes
@@ -29,7 +28,7 @@ void collectpath(maplist_t maplist, int32_t startpoint, int8_t n, int8_t m);
 int main(void)
 {
 	int8_t i, j;
-	int32_t q;;
+	int32_t q;
 
 	q = 1;
 	maplist = (map_t **)malloc(sizeof(map_t *));
@@ -132,7 +131,24 @@ void calcpathv(map_t *map)
 	map->result += map->path[map->n-1][map->m-1];
 }
 
-void collectpath(maplist_t maplist, int32_t startpoint, int8_t n, int8_t m)
+void collectpath(maplist_t maplist, int32_t point, int8_t n, int8_t m)
 {
-	
+	map_t *map = maplist[point]
+	while(n < 0 && m < 0)
+	{
+		if(map->path[n][m] == map->map[n][m] + map->path[n][m - 1])
+		{
+			if(map->path[n][m] == map->map[n][m] + map->path[n - 1][m])
+			{
+				maplist->maplist = (map_t **)realloc(sizeof(map_t *) * (maplist->size + 1));
+				maplist->maplist[size] = map_copy(map);
+				maplist->size++;
+				collectpath(maplist, size - 1, n - 1, m);
+				map->map[n][m] == 0;
+				m--;
+			}
+			else {map->map[n][m] == 0; m--;}
+		}
+		else {map->map[n][m] == 0; n--;}
+	}
 }
