@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <string.h>
+
 
 typedef struct map_t
 {
@@ -14,36 +16,50 @@ typedef struct map_t
 
 typedef struct maplist_t
 {
+	int8_t n, m;
 	map_t **maplist;
 	int16_t size;
-} maplist_t
+} maplist_t;
 
 //function prototypes
 void flip_map(map_t *map);
 void calcpathv(map_t *map);
 map_t *map_init(int8_t n, int8_t m);
 map_t *map_copy(map_t *map);
-void collectpath(maplist_t maplist, int32_t startpoint, int8_t n, int8_t m);
+void collectpath(maplist_t *maplist, int32_t point, int8_t n, int8_t m);
 
 int main(void)
 {
-	int8_t i, j;
-	int32_t q;
+	int16_t i, j;
+	maplist_t *maplist;
 
-	q = 1;
-	maplist = (map_t **)malloc(sizeof(map_t *));
-	scanf("%d %d", &i, &j);
-	maplist[0] = map_init(i, j);
+	maplist = (maplist_t *)malloc(sizeof(maplist_t));
+	maplist->maplist = (map_t **)malloc(sizeof(map_t *));
+	maplist->size = 1;
+	scanf("%"SCNd8" %"SCNd8, (int8_t *)&i, (int8_t *)&j);
+	maplist->n = i; maplist->m = j;
+	maplist->maplist[0] = map_init(i, j);
 	i = 0;
-	while(i < *(maplist)->n)
+	while(i < maplist->n)
 	{
 		j = 0;
-		while(j < *(maplist)->m)
-		{
-			scanf("%d", *(maplist)->map[i][j]);
+		while(j < maplist->m)
+			{
+			scanf("%"SCNd8, maplist->maplist[0]->map[i][j]);
 			j++;
 		}
 		i++;
+	}
+	for(int a = 3; a ; a--)
+	{
+		i = 0;
+		j = maplist->size;
+		while(i < j)
+		{
+			calcpathv(maplist->maplist[i]);
+			collectpath(maplist, i, maplist->n, maplist->m);
+			i++;
+		}
 	}
 }
 
@@ -85,7 +101,7 @@ map_t *map_copy(map_t *map)
 
 void flip_map(map_t *map)
 {
-	int8_t i,j
+	int8_t i,j;
 	int16_t buf;
 
 	i = 0;
@@ -131,24 +147,35 @@ void calcpathv(map_t *map)
 	map->result += map->path[map->n-1][map->m-1];
 }
 
-void collectpath(maplist_t maplist, int32_t point, int8_t n, int8_t m)
+void collectpath(maplist_t *maplist, int32_t point, int8_t n, int8_t m)
 {
-	map_t *map = maplist[point]
+	map_t *map = maplist->maplist[point];
 	while(n < 0 && m < 0)
 	{
 		if(map->path[n][m] == map->map[n][m] + map->path[n][m - 1])
 		{
 			if(map->path[n][m] == map->map[n][m] + map->path[n - 1][m])
 			{
-				maplist->maplist = (map_t **)realloc(sizeof(map_t *) * (maplist->size + 1));
-				maplist->maplist[size] = map_copy(map);
+				realloc(maplist->maplist, sizeof(map_t *) * (maplist->size + 1));
+				maplist->maplist[maplist->size] = map_copy(map);
 				maplist->size++;
-				collectpath(maplist, size - 1, n - 1, m);
 				map->map[n][m] == 0;
+				collectpath(maplist, maplist->size - 1, n - 1, m);
 				m--;
 			}
 			else {map->map[n][m] == 0; m--;}
 		}
 		else {map->map[n][m] == 0; n--;}
 	}
+	if(n == 0) while(m <= 0)
+	{
+		map->map[n][m] = 0;
+		m--;
+	}
+	else while(n <= 0)
+	{
+		map->map[n][m] = 0;
+		n--;
+	}
+	filp_map(map);
 }
