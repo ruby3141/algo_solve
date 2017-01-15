@@ -45,7 +45,7 @@ int main(void)
 		j = 0;
 		while(j < maplist->m)
 			{
-			scanf("%"SCNd8, maplist->maplist[0]->map[i][j]);
+			scanf("%"SCNd16, maplist->maplist[0]->map[i]+j);
 			j++;
 		}
 		i++;
@@ -61,6 +61,13 @@ int main(void)
 			i++;
 		}
 	}
+	i = 0; j = 0;
+	while(i < maplist->size)
+	{
+		if(j < maplist->maplist[i]->result) j = maplist->maplist[i]->result;
+		i++;
+	}
+	printf("%"PRId16, j);
 }
 
 map_t *map_init(int8_t n, int8_t m)
@@ -156,7 +163,7 @@ void collectpath(maplist_t *maplist, int32_t point, int8_t n, int8_t m)
 		{
 			if(map->path[n][m] == map->map[n][m] + map->path[n - 1][m])
 			{
-				realloc(maplist->maplist, sizeof(map_t *) * (maplist->size + 1));
+				maplist->maplist=realloc(maplist->maplist,sizeof(map_t *)*(maplist->size + 1));
 				maplist->maplist[maplist->size] = map_copy(map);
 				maplist->size++;
 				map->map[n][m] == 0;
@@ -177,5 +184,5 @@ void collectpath(maplist_t *maplist, int32_t point, int8_t n, int8_t m)
 		map->map[n][m] = 0;
 		n--;
 	}
-	filp_map(map);
+	flip_map(map);
 }
