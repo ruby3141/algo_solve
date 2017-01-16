@@ -57,7 +57,7 @@ int main(void)
 		while(i < j)
 		{
 			calcpathv(maplist->maplist[i]);
-			collectpath(maplist, i, maplist->n, maplist->m);
+			collectpath(maplist, i, maplist->n - 1, maplist->m - 1);
 			i++;
 		}
 	}
@@ -102,6 +102,7 @@ map_t *map_copy(map_t *map)
 	{
 		memcpy(*(map->map + i), *(temp->map + i), map->m);
 		memcpy(*(map->path + i), *(temp->path +i), map->m);
+		i++;
 	}
 	return temp;
 }
@@ -157,16 +158,16 @@ void calcpathv(map_t *map)
 void collectpath(maplist_t *maplist, int32_t point, int8_t n, int8_t m)
 {
 	map_t *map = maplist->maplist[point];
-	while(n < 0 && m < 0)
+	while(n > 0 && m > 0)
 	{
 		if(map->path[n][m] == map->map[n][m] + map->path[n][m - 1])
 		{
 			if(map->path[n][m] == map->map[n][m] + map->path[n - 1][m])
 			{
+				map->map[n][m] = 0;
 				maplist->maplist=realloc(maplist->maplist,sizeof(map_t *)*(maplist->size + 1));
 				maplist->maplist[maplist->size] = map_copy(map);
 				maplist->size++;
-				map->map[n][m] == 0;
 				collectpath(maplist, maplist->size - 1, n - 1, m);
 				m--;
 			}
@@ -174,12 +175,12 @@ void collectpath(maplist_t *maplist, int32_t point, int8_t n, int8_t m)
 		}
 		else {map->map[n][m] == 0; n--;}
 	}
-	if(n == 0) while(m <= 0)
+	if(n == 0) while(m >= 0)
 	{
 		map->map[n][m] = 0;
 		m--;
 	}
-	else while(n <= 0)
+	else while(n >= 0)
 	{
 		map->map[n][m] = 0;
 		n--;
