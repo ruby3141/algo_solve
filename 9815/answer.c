@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-int16_t nextint(int16_t input);
+int16_t nextint(int16_t input, int8_t digit);
 
 int64_t main(void)
 {
@@ -24,44 +24,31 @@ int64_t main(void)
 					printf("Ok!! %"PRId16" times\n", i);
 					break;
 				}
-				input = nextint(input);
+				input = nextint(input, input>999?4:input>99?3:input>9?2:1);
 			}
 		}
 	}
 }
 
-int16_t nextint(int16_t input)
+int16_t nextint(int16_t input, int8_t digit)
 {
-	int16_t buf[4], k;
-	for(int8_t i = 0; i != 4; i++)
+	int8_t buf[digit+1], k;
+	int16_t p, q;
+	for(int8_t i = 0; i < digit+1; i++)
 	{
-		buf[i] = input - (input / 10 * 10);
+		buf[i] = input - (input / 10 * 10) + '0';
 		input /= 10;
 	}
-	for(int8_t i = 3; i >= 0; i--)
+	buf[digit] = '\0';
+	for(int8_t i = digit-1; i >= 0; i--)
 	{
-		for(int8_t j = 0; j > i; j++)
+		for(int8_t j = 0; j < i; j++)
 			if(buf[j] > buf[i]) {k = buf[j]; buf[j] = buf[i]; buf[i] = k;}
 	}
-	if(buf[2] == 0){printf("%"PRId16"-%"PRId16"=0\n", buf[3], buf[3]); return 0;}
-	else if(buf[1] == 0) 
-	{
-		printf("%"PRId16"%"PRId16"-%"PRId16"%"PRId16"=%"PRId16"\n",
-		buf[3], buf[2], buf[2], buf[3], (buf[3] - buf[2]) * 9);
-		return (buf[3] - buf[2]) * 9;
-	}
-	else if(buf[0] == 0)
-	{
-		printf("%"PRId16"%"PRId16"%"PRId16"-%"PRId16"%"PRId16"%"PRId16"=%"PRId16"\n",
-		buf[3], buf[2], buf[1], buf[1], buf[2], buf[3], (buf[3] - buf[1]) * 99);
-		return (buf[3] - buf[1]) * 99;
-	}
-	else
-	{
-		printf("%"PRId16"%"PRId16"%"PRId16"%"PRId16
-		"-%"PRId16"%"PRId16"%"PRId16"%"PRId16"=%"PRId16"\n",
-		buf[3], buf[2], buf[1], buf[0], buf[0], buf[1], buf[2], buf[3],
-		(buf[3]-buf[0]) * 999 + (buf[2] - buf[1]) * 99);
-		return (buf[3]-buf[0]) * 999 + (buf[2] - buf[1]) * 99;
-	}
+	p = (int16_t)atoi(buf);
+	for(int8_t i = digit-1; i > (digit-1)/2; i--)
+		{k = buf[i]; buf[i] = buf[digit-i-1]; buf[digit-i-1] = k;}
+	q = (int16_t)atoi(buf);
+	printf("%"PRId16"-%"PRId16"=%"PRId16"\n", q,p,q-p);
+	return q-p;
 }
