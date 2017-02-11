@@ -7,6 +7,6 @@ int main(void)
 {
 	int8_t a, b;
 	scanf("%"SCNd8"%"SCNd8, &a, &b);
-	printf("%llf", (long double)a/(long double)b);
+	printf("%.9llf", (long double)a/(long double)b);
 	return 0;
 }
