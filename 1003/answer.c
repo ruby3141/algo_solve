@@ -1,30 +1,20 @@
-//https://www.acmicpc.net/problem/1003
-
 #include <stdio.h>
-#include <inttypes.h>
-
-int32_t _0;
-int32_t _1;
-
-int32_t fiv(int32_t input);
 
 int main(void)
 {
-	int32_t t, input;
-	scanf("%"SCNd32, &t);
-	while(t--)
-	{
-		_0 = 0;
-		_1 = 0;
-		scanf("%"SCNd32, &input);
-		fiv(input);
-		printf("%"PRId32" %"PRId32"\n", _0, _1);
-	}
-}
+	int fib[2][41];
+	int i,j;
 
-int32_t fiv(int32_t input)
-{
-	if(input == 0) {_0++; return 0;}
-	if(input == 1) {_1++; return 1;}
-	return fiv(input - 1) + fiv(input - 2);
+	fib[0][0] = fib[1][1] = 1;
+	fib[1][0] = fib[0][1] = 0;
+	for(i = 2; i < 41; i++)
+	{
+		fib[0][i] = fib[0][i-1] + fib[0][i-2];
+		fib[1][i] = fib[1][i-1] + fib[1][i-2];
+	}
+	for(scanf("%d", &i);i--;)
+	{
+		scanf("%d", &j);
+		printf("%d %d\n", fib[0][j], fib[1][j]);
+	}
 }
