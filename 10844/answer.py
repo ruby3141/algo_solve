@@ -13,4 +13,4 @@ while N > 1:
     currIter = nextIter
     N -= 1
 
-print(f"{sum(currIter[1:10])}")
+print(f"{sum(currIter[1:10]) % 1000000000}")
