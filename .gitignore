@@ -2,6 +2,11 @@
 !/**/
 !*.*
 !notsolved
+*.exe
+*.dll
+*.ilk
+*.obj
+*.pdb
 
 .*
 !.gitignore
